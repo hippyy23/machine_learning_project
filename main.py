@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.svm import SVC
 
 # Load data
 df = pd.read_csv('data/heart-attack-data.csv')
@@ -56,3 +57,12 @@ y_pred_knn = knn.predict(X_test_scaled)
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred_knn)
 print(f"Accuracy of KNN: {accuracy: .4f} ({accuracy*100: .2f}%)")
+
+# Model 2: SVM
+svm = SVC(kernel='linear', random_state=42)
+svm.fit(X_train_scaled, y_train)
+y_pred_svm = svm.predict(X_test_scaled)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred_svm)
+print(f"Accuracy of SVM: {accuracy: .4f} ({accuracy * 100: .2f}%)")
