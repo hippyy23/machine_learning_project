@@ -4,6 +4,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 
 # Load data
 df = pd.read_csv('data/heart-attack-data.csv')
@@ -66,3 +67,12 @@ y_pred_svm = svm.predict(X_test_scaled)
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred_svm)
 print(f"Accuracy of SVM: {accuracy: .4f} ({accuracy * 100: .2f}%)")
+
+# Model 3: Decision Tree
+dt = DecisionTreeClassifier(random_state=42)
+dt.fit(X_train_scaled, y_train)
+y_pred_dt = dt.predict(X_test_scaled)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred_dt)
+print(f"Accuracy of Decision Tree: {accuracy: .4f} ({accuracy * 100: .2f}%)")
