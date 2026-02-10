@@ -1,10 +1,20 @@
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+
+
+def evaluate_model(model, y_true, y_pred):
+    print(f"Evaluating {model} model...")
+    print(classification_report(y_true, y_pred))
+
+    cm = confusion_matrix(y_true, y_pred)
+    print(f"Confusion matrix:\n{cm}")
 
 # Load data
 df = pd.read_csv('data/heart-attack-data.csv')
@@ -76,3 +86,17 @@ y_pred_dt = dt.predict(X_test_scaled)
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred_dt)
 print(f"Accuracy of Decision Tree: {accuracy: .4f} ({accuracy * 100: .2f}%)")
+
+evaluate_model("KNN", y_test, y_pred_knn)
+evaluate_model("SVM", y_test, y_pred_svm)
+evaluate_model("Decision Tree", y_test, y_pred_dt)
+
+# Cross validation
+X_scaled_full = scaler.fit_transform(X)
+svm_scores = cross_val_score(svm, X_scaled_full, y, cv=5)
+
+print(f"Cross validation scores for SVM: {svm_scores}")
+print(f"Average SVM accuracy: {np.mean(svm_scores) * 100: .2f}%")
+
+dt_scores = cross_val_score(dt, X, y, cv=5)
+print(f"Decision Tree average accuracy: {np.mean(dt_scores) * 100: .2f}%")
