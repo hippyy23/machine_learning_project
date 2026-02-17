@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
@@ -119,5 +120,16 @@ print(f"Average SVM accuracy: {np.mean(svm_scores) * 100: .2f}%")
 dt_scores = cross_val_score(dt, X, y, cv=5)
 print(f"Decision Tree average accuracy: {np.mean(dt_scores) * 100: .2f}%")
 
-cm_display = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test, y_pred_svm),
+knn_cm_display = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test, y_pred_knn),
                                     display_labels=["Healthy", "Heart Attack"])
+
+svm_cm_display = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test, y_pred_svm),
+                                    display_labels=["Healthy", "Heart Attack"])
+
+knn_cm_display.plot()
+plt.title("Confusion matrix for KNN model")
+plt.show()
+
+svm_cm_display.plot()
+plt.title("Confusion matrix for SVM model")
+plt.show()
