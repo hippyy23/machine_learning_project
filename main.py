@@ -126,10 +126,10 @@ knn_cm_display = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test
 svm_cm_display = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test, y_pred_svm),
                                     display_labels=["Healthy", "Heart Attack"])
 
-knn_cm_display.plot()
+knn_cm_display.plot(cmap='Greens', colorbar=False)
 plt.title("Confusion matrix for KNN model")
 plt.show()
 
-svm_cm_display.plot()
+svm_cm_display.plot(cmap='Greens', colorbar=False)
 plt.title("Confusion matrix for SVM model")
 plt.show()
