@@ -7,6 +7,8 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import ConfusionMatrixDisplay
 
 
 def evaluate_model(model, y_true, y_pred):
@@ -57,26 +59,38 @@ print("Data scaled!")
 print(f"First row of scaled training data: \n{X_train_scaled[0]}")
 
 # Model 1: KNN
-knn = KNeighborsClassifier(n_neighbors=5)
+knn_params_grid = {'n_neighbors': [3, 5, 7, 9, 11, 15, 19, 21]}
+knn_grid = GridSearchCV(KNeighborsClassifier(), knn_params_grid, cv=5)
+knn_grid.fit(X_train_scaled, y_train)
 
-# Train the model
-knn.fit(X_train_scaled, y_train)
+print(f"Best parameters for KNN: {knn_grid.best_params_}")
 
-# Test the model
-y_pred_knn = knn.predict(X_test_scaled)
+# Use the best model
+y_pred_knn = knn_grid.predict(X_test_scaled)
 
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred_knn)
-print(f"Accuracy of KNN: {accuracy: .4f} ({accuracy*100: .2f}%)")
+print(f"Accuracy of best KNN: {accuracy: .4f} ({accuracy * 100: .2f}%)")
+
+# Save the best model
+knn = knn_grid.best_estimator_
 
 # Model 2: SVM
-svm = SVC(kernel='linear', random_state=42)
-svm.fit(X_train_scaled, y_train)
-y_pred_svm = svm.predict(X_test_scaled)
+svm_param_grid = {'kernel': ['linear', 'poly', 'rbf'], 'C': [0.1, 1, 10, 100]}
+svm_grid = GridSearchCV(SVC(random_state=42), svm_param_grid, cv=5)
+svm_grid.fit(X_train_scaled, y_train)
+
+print(f"Best parameters for SVM: {svm_grid.best_params_}")
+
+# Use the best model
+y_pred_svm = svm_grid.predict(X_test_scaled)
 
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred_svm)
 print(f"Accuracy of SVM: {accuracy: .4f} ({accuracy * 100: .2f}%)")
+
+# Save the best model
+svm = svm_grid.best_estimator_
 
 # Model 3: Decision Tree
 dt = DecisionTreeClassifier(random_state=42)
@@ -93,10 +107,17 @@ evaluate_model("Decision Tree", y_test, y_pred_dt)
 
 # Cross validation
 X_scaled_full = scaler.fit_transform(X)
-svm_scores = cross_val_score(svm, X_scaled_full, y, cv=5)
 
+knn_scores = cross_val_score(knn, X_scaled_full, y, cv=5)
+print(f"Cross validation scores for KNN: {knn_scores}")
+print(f"Average KNN accuracy: {np.mean(knn_scores) * 100: .2f}%")
+
+svm_scores = cross_val_score(svm, X_scaled_full, y, cv=5)
 print(f"Cross validation scores for SVM: {svm_scores}")
 print(f"Average SVM accuracy: {np.mean(svm_scores) * 100: .2f}%")
 
 dt_scores = cross_val_score(dt, X, y, cv=5)
 print(f"Decision Tree average accuracy: {np.mean(dt_scores) * 100: .2f}%")
+
+cm_display = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test, y_pred_svm),
+                                    display_labels=["Healthy", "Heart Attack"])
